@@ -1,29 +1,34 @@
+let postArray = []
+const postTitle = document.getElementById('title')
+const postBody = document.getElementById('body')
+const form = document.getElementById('new-post')
+
+function renderPosts(){
+    let blogListHtml = ""
+    for(let post of postArray){
+    blogListHtml += `<div>
+    <h3>${post.title}</h3>
+    <p>${post.body}</p>
+    <hr>
+</div>`
+    }
+    document.getElementById('container').innerHTML = blogListHtml
+}
+
 fetch('https://apis.scrimba.com/jsonplaceholder/posts/', {method: "GET"})
 .then(res => res.json())
 .then((data) => {
-        const postArr = data.slice(0,5)
-        let blogListHtml = ""
-        for(post of postArr){
-            blogListHtml += `
-            <div>
-                <h3>${post.title}</h3>
-                <p>${post.body}</p>
-                <hr>
-            </div>`
-        }
-        document.getElementById('container').innerHTML += blogListHtml
+        postArray = data.slice(0,5)
+        renderPosts()
     })
 
-document.addEventListener('submit', function(e){
+form.addEventListener('submit', function(e){
     e.preventDefault();
-    let postTitle = document.getElementById('title').value
-    let postBody = document.getElementById('body').value
+    
     const data = {
-        title: postTitle,
-        body: postBody
+        title: postTitle.value,
+        body: postBody.value
     }
-    document.getElementById('title').value = ""
-    document.getElementById('body').value = ""
     fetch('https://apis.scrimba.com/jsonplaceholder/todos/', {
         method: "POST",
         headers: {
@@ -36,13 +41,8 @@ document.addEventListener('submit', function(e){
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById('container').innerHTML = `
-        <div>
-            <h3>${data.title}</h3>
-            <p>${data.body}</p>
-            <hr>
-        </div>
-        ${document.getElementById('container').innerHTML}
-        `
+        postArray.unshift(data)
+        renderPosts()
+        form.reset()
     })
 })
